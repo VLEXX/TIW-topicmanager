@@ -1,0 +1,10 @@
+<html>
+<section th:fragment="topicFragment">
+  <ul>
+    <li th:each="topicBean : ${topicBeanList}">
+      <span  th:text="${topicBean.getTreeindex()+' '+topicBean.getTopic()}"></span>
+      <section th:include="@{TopicTreeFragment} :: topicFragment" th:with="topicBeanList=${topicBean.getChildren()}"></section>
+    </li>
+  </ul>
+</section>
+</html>

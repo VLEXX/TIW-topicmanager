@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+</head>
+<body>
+<h3>Bentornato <span th:text="${username}"></span></h3>
+<h4>Ecco l'elenco delle categorie disponibili</h4>
+<span th:utext="${DBerror}"></span>
+<section th:include="@{TopicTreeFragment} :: topicFragment" th:with="topicBeanList=${rootTopicBeanAsList}"></section>
+<h4>Aggiungi un nuovo topic</h4>
+<form action="/gruppo33/areapersonale/addtopic" method="post">
+    <div>
+        <label>Nome nuova categoria</label>
+    </div>
+    <div>
+        <input type="text" id="topicfield" name="topicname" placeholder="nome nuovo topic" th:value="${newcat} ?: ''" required>
+    </div>
+    <div>
+        <label>Nome categoria padre </label>
+        <span><br>(lasciare vuoto se si desidera aggiungere la nuova categoria alla radice) </span>
+    </div>
+    <div>
+        <input type="text" id="fathertopicfield" name="fathertopicname" placeholder="nome categoria padre">
+    </div>
+    <span>ogni categoria puo' avere un massimo di 9 sottocategorie<br></span>
+    <span th:utext="${errore}"></span>
+    <input type="submit" value="Inserisci">
+</form>
+<p><a href="/gruppo33/logout">Clicca qui</a> per effettuare il logout</p>
+</body>
+</html>

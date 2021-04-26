@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Accedi</title>
+</head>
+<body>
+<h1>Inserire le credenziali per continuare</h1>
+<form action="/gruppo33/logincheck" method="post">
+  <div>
+    <label>Nome utente</label>
+  </div>
+  <div>
+    <input type="text" id="usernamefield" name="username" placeholder="nome utente" th:value="${username} ?: ''" required>
+  </div>
+  <div>
+    <label>Password  </label>
+  </div>
+  <div>
+    <input type="password" id="passwordfield" name="password" placeholder="password" required>
+  </div>
+  <span th:utext="${errore}"></span>
+  <input type="submit" value="Accedi">   
+</form>
+<a href="/register"> Non possiedi un account? Registrati</a>
+</body>
+</html>
