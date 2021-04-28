@@ -22,13 +22,13 @@ public class TopicAdder extends HttpServlet {
         String ftopicname = request.getParameter("fathertopicname");
         TemplateEngineManager tem = new TemplateEngineManager(this.getServletContext());
         WebContext webctx = new WebContext(request, response, this.getServletContext(), request.getLocale());
+        webctx.setVariable("username", ((UserBean)request.getSession().getAttribute("user")).getUsername());
 
 
     //caso 1a: topicname nullo o vuoto
         if(topicname == null || topicname.isBlank()){
             System.out.println("TopicAdder: i dati non sono validi -> dispatching edited Home.html");
             webctx.setVariable("errore", "<p style=\"color:red;\">E' obbligatorio specificare la nuova categoria!</p>");
-            //todo spostare la riga sopra in fondo e gestire eccezioni sia qui sia nel caricamento dell'albero nella home
         }else{
             Connection c = null;
             try {
@@ -92,25 +92,14 @@ public class TopicAdder extends HttpServlet {
         try {
             Connection c2 = DBConnectionSupplier.getConnection();
             td2 = new TopicDAO(c2);
-
-        ArrayList<Integer> rootlist = new ArrayList<>(td2.findChildrenIdById(null));
-        ArrayList<TopicBean> roottopiclist = new ArrayList<>();
-        for(Integer i : rootlist){
-            roottopiclist.add(new TopicBean(td2,i,null,Integer.toString(rootlist.indexOf(i)+1)));
-        }
-        c2.close();
-
-        if(rootlist.size()==roottopiclist.size())
-            System.out.println("TopicAdder: elenco dei topic letto correttamente dal DB, l'elenco radice contiene "+roottopiclist.size()+" elementi");
-        else
-            System.out.println("TopicAdder: errore durante la costruzione dell'elenco, "+roottopiclist.size() +"elementi aggiunti in radice su "+rootlist.size()+" elementi letti");
-        webctx.setVariable("rootTopicBeanAsList",roottopiclist);
+            ArrayList<TopicBean> roottopiclist = td2.treeGenerator();
+            c2.close();
+            webctx.setVariable("rootTopicBeanAsList",roottopiclist);
         } catch (SQLException throwables) {
             throwables.printStackTrace();
             webctx.setVariable("DBerror","<br>Il servizio non è al momento disponibile, riprovare più tardi<br>");
 
-    } finally{
-            webctx.setVariable("username", ((UserBean)request.getSession().getAttribute("user")).getUsername());
+        } finally{
             tem.getTemplateEngine().process("Home", webctx, response.getWriter());
         }
     }

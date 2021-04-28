@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Scegli la destinazione</title>
+</head>
+<body>
+<h3>Bentornato <span th:text="${username}"></span></h3>
+<h4>Scegli la nuova categoria padre</h4>
+<span>Ogni categoria puo' avere un massimo di 9 sottocategorie. <br>La categoria e il relativo sottoalbero verranno spostati nella destinazione scelta<br><span th:utext="${rootinsertion}"></span></span>
+<span th:utext="${DBerror}"></span>
+<section th:include="@{DestinationTopicTreeFragment} :: dtopicFragment" th:with="topicBeanList=${rootTopicBeanAsList},isTruechild=${false},topictbm=${topictbm}"></section>
+</body>
+</html>

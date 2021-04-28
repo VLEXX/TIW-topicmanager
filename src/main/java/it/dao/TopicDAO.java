@@ -1,5 +1,6 @@
 package it.dao;
 
+import it.beans.TopicBean;
 import it.exceptions.TopicNotFoundException;
 
 import java.sql.*;
@@ -126,5 +127,18 @@ public class TopicDAO {
         p.close();
         return res;
 
+    }
+
+    public ArrayList<TopicBean> treeGenerator() throws SQLException {
+        ArrayList<Integer> rootlist = new ArrayList<>(this.findChildrenIdById(null));
+        ArrayList<TopicBean> roottopiclist = new ArrayList<>();
+        for(Integer i : rootlist){
+            roottopiclist.add(new TopicBean(this,i,null,Integer.toString(rootlist.indexOf(i)+1)));
+        }
+        if(rootlist.size()==roottopiclist.size())
+            System.out.println("TopicDAO: elenco dei topic letto correttamente dal DB, l'elenco radice contiene "+roottopiclist.size()+" elementi");
+        else
+            System.out.println("TopicDAO: errore durante la costruzione dell'elenco, "+roottopiclist.size() +"elementi aggiunti in radice su "+rootlist.size()+" elementi letti");
+        return new ArrayList<>(roottopiclist);
     }
 }

@@ -1,0 +1,20 @@
+<html>
+<section th:fragment="dtopicFragment">
+  <ul>
+    <li th:each="topicBean : ${topicBeanList}">
+      <span th:if="${#strings.equals(topicBean.getTopic(),topictbm) or isTruechild}">
+        <span  style=color:darkorange th:text="${topicBean.getTreeindex()+' '+topicBean.getTopic()}"></span>
+        <section th:include="@{DestinationTopicTreeFragment} :: dtopicFragment" th:with="topicBeanList=${topicBean.getChildren()},isTruechild=${true},topictbm=${topictbm}"></section>
+      </span>
+      <span th:if="${!(#strings.equals(topicBean.getTopic(),topictbm)) and !(isTruechild) and !(topicBean.getChildren().size()>=9)}">
+        <span  th:utext="${topicBean.getTreeindex()+' '+topicBean.getTopic()+' <a href=/gruppo33/areapersonale/moveto?dest='+topicBean.getTopic()+'&src='+topictbm+'>sposta qui</a>'}"></span>
+        <section th:include="@{DestinationTopicTreeFragment} :: dtopicFragment" th:with="topicBeanList=${topicBean.getChildren()},isTruechild=${false},topictbm=${topictbm}"></section>
+      </span>
+      <span th:if="${!(#strings.equals(topicBean.getTopic(),topictbm)) and !(isTruechild) and (topicBean.getChildren().size()>=9)}">
+        <span  th:utext="${topicBean.getTreeindex()+' '+topicBean.getTopic()}"></span>
+        <section th:include="@{DestinationTopicTreeFragment} :: dtopicFragment" th:with="topicBeanList=${topicBean.getChildren()},isTruechild=${false},topictbm=${topictbm}"></section>
+      </span>
+    </li>
+  </ul>
+</section>
+</html>
