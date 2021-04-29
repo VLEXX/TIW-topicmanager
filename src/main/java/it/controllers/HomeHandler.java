@@ -24,7 +24,6 @@ public class HomeHandler extends HttpServlet {
         try {
             Connection c = DBConnectionSupplier.getConnection();
             TopicDAO td = new TopicDAO(c);
-            ArrayList<Integer> rootlist = new ArrayList<>(td.findChildrenIdById(null));
             ArrayList<TopicBean> roottopiclist = td.treeGenerator();
             c.close();
             webctx.setVariable("rootTopicBeanAsList",roottopiclist);

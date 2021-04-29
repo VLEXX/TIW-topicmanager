@@ -5,6 +5,7 @@ import it.exceptions.TopicNotFoundException;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class TopicDAO {
     private final Connection c;
@@ -109,7 +110,7 @@ public class TopicDAO {
 
     }
 
-    public int insertNewTopic(String name, Integer parid, int position) throws SQLException {
+    public void insertNewTopic(String name, Integer parid, int position) throws SQLException {
         PreparedStatement p = null;
         if(parid!=null) {
             String query = "INSERT INTO dbimagecat.categories (name,parentId,childrenOrder) VALUES (?,?,?)";
@@ -125,7 +126,6 @@ public class TopicDAO {
         }
         int res = p.executeUpdate();
         p.close();
-        return res;
 
     }
 
@@ -141,4 +141,62 @@ public class TopicDAO {
             System.out.println("TopicDAO: errore durante la costruzione dell'elenco, "+roottopiclist.size() +"elementi aggiunti in radice su "+rootlist.size()+" elementi letti");
         return new ArrayList<>(roottopiclist);
     }
+
+    public int changeFatherTo(int id, Integer f) throws SQLException {
+        String query1 = "UPDATE dbimagecat.categories SET parentId = ?, childrenOrder = ? WHERE Id = ?";
+        String query2 = "SELECT parentId FROM dbimagecat.categories WHERE Id = ?";
+        String query3 = "UPDATE dbimagecat.categories SET childrenOrder = ? WHERE Id = ?";
+        ArrayList<Integer> tb = this.findChildrenIdById(f);
+
+        if(tb.size()>=9)
+            return 1;
+        c.setAutoCommit(false);
+        try {
+            PreparedStatement p1 = c.prepareStatement(query1);
+            PreparedStatement p2 = c.prepareStatement(query2);
+
+            p2.setInt(1, id);
+            ResultSet r2 = p2.executeQuery();
+            Integer oldfather = null;
+            if (r2.next())
+                oldfather = r2.getInt("parentId");
+
+
+            PreparedStatement p3 = c.prepareStatement(query3);
+            ArrayList<Integer> oldbrothers = new ArrayList<>(this.findChildrenIdById(oldfather));
+            oldbrothers.remove(Integer.valueOf(id));
+            for (Integer o : oldbrothers) {
+                p3.setInt(2, o);
+                p3.setInt(1, oldbrothers.indexOf(o) + 1);
+                p3.executeUpdate();
+                p3.clearParameters();
+            }
+//todo il problema sembra essere legato agli indici dei fratelli vecchi che non vengono aggiornati, in particolare quelli più grandi dell'oggetto rimosso
+            if (f == null)
+                p1.setNull(1, Types.INTEGER);
+            else
+                p1.setInt(1, f);
+            tb = this.findChildrenIdById(f);
+            p1.setInt(2,tb.size()+ (tb.contains(id) ? 0 : 1));
+            p1.setInt(3, id);
+            p1.executeUpdate();
+            c.commit();
+            r2.close();
+            p1.close();
+            p2.close();
+            p3.close();
+            c.setAutoCommit(true);
+
+        } catch (SQLException e){
+            c.rollback();
+            c.setAutoCommit(true);
+        }
+        return 0;
+
+
+
+
+    }
+
+
 }
