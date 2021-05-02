@@ -18,6 +18,7 @@ public class TopicSetter extends HttpServlet {
         TemplateEngineManager tem = new TemplateEngineManager(this.getServletContext());
         WebContext webctx = new WebContext(request, response, this.getServletContext(), request.getLocale());
         webctx.setVariable("username", ((UserBean)request.getSession().getAttribute("user")).getUsername());
+        webctx.setVariable("backhome","<a href=\"/gruppo33/areapersonale/home\">Clicca qui</a> per annullare lo spostamento");
         String source = request.getParameter("src");
         String dest = request.getParameter("dest");
         if(source==null||source.isBlank()){
@@ -36,16 +37,22 @@ public class TopicSetter extends HttpServlet {
                     System.out.println("TopicSetter: la categoria da spostare o la destinazione scelta non esistono");
                     webctx.setVariable("DBerror","<br>la categoria da spostare o la destinazione scelta non esistono, <a href=\"/gruppo33/areapersonale/home\">clicca qui</a> per annullare lo spostamento.<br>");
                     tem.getTemplateEngine().process("HomeDestination", webctx, response.getWriter());
-                }else{
-                    int success = td.changeFatherTo(src,dst);
-                    if(success==1){
-                        System.out.println("TopicSetter: la destinazione ha gia' 9 sottocategorie");
-                        webctx.setVariable("DBerror","<br>la destinazione ha gia' 9 sottocategorie, <a href=\"/gruppo33/areapersonale/home\">clicca qui</a> per annullare lo spostamento.<br>");
+                }else {
+                    if (dest!=null && td.getFatherHierarcy(dst).contains(src)) {
+                        System.out.println("TopicSetter: la categoria da spostare o la destinazione scelta non esistono");
+                        webctx.setVariable("DBerror", "<br>la destinazione scelta non e' valida in quanto sottocategoria della categoria da spostare, <a href=\"/gruppo33/areapersonale/home\">clicca qui</a> per annullare lo spostamento.<br>");
                         tem.getTemplateEngine().process("HomeDestination", webctx, response.getWriter());
                     }else{
+                    int success = td.changeFatherTo(src, dst);
+                    if (success == 1) {
+                        System.out.println("TopicSetter: la destinazione ha gia' 9 sottocategorie");
+                        webctx.setVariable("DBerror", "<br>la destinazione ha gia' 9 sottocategorie, <a href=\"/gruppo33/areapersonale/home\">clicca qui</a> per annullare lo spostamento.<br>");
+                        tem.getTemplateEngine().process("HomeDestination", webctx, response.getWriter());
+                    } else {
                         System.out.println("TopicSetter: spostamento eseguito con successo -> redirect a home");
-                        response.sendRedirect(request.getContextPath()+"/areapersonale/home");
+                        response.sendRedirect(request.getContextPath() + "/areapersonale/home");
                     }
+                }
                 }
                 c.close();
             } catch (SQLException throwables) {

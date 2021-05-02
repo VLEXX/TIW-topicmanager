@@ -10,5 +10,6 @@
 <span>Ogni categoria puo' avere un massimo di 9 sottocategorie. <br>La categoria e il relativo sottoalbero verranno spostati nella destinazione scelta<br><span th:utext="${rootinsertion}"></span></span>
 <span th:utext="${DBerror}"></span>
 <section th:include="@{DestinationTopicTreeFragment} :: dtopicFragment" th:with="topicBeanList=${rootTopicBeanAsList},isTruechild=${false},topictbm=${topictbm}"></section>
+<p th:utext="${backhome}"></p>
 </body>
 </html>

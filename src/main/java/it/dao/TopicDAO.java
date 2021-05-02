@@ -53,11 +53,12 @@ public class TopicDAO {
         PreparedStatement p=null;
         ArrayList<Integer> children = new ArrayList<>();
         try{
-            if(parid != null) {
+            if(parid != null && parid !=0) {
                 p = c.prepareStatement(query);
                 p.setInt(1, parid);
                 res1 = p.executeQuery();
             }else {
+                System.out.println("TopicDAO: ricerca id alla radice");
                 p = c.prepareStatement(query2);
                 res1 = p.executeQuery();
             }
@@ -65,17 +66,11 @@ public class TopicDAO {
             while(res1.next()){
                 children.add(res1.getInt("Id"));
             }
+            System.out.println("La ricerca ha prodotto "+children.size()+" risultati");
+            res1.close();
+            p.close();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
-        } finally {
-            try {
-                if(res1 != null)
-                    res1.close();
-                if(p!=null)
-                    p.close();
-            } catch (Exception e1) {
-                throw new SQLException(e1);
-            }
         }
         return children;
     }
@@ -143,40 +138,60 @@ public class TopicDAO {
     }
 
     public int changeFatherTo(int id, Integer f) throws SQLException {
-        String query1 = "UPDATE dbimagecat.categories SET parentId = ?, childrenOrder = ? WHERE Id = ?";
-        String query2 = "SELECT parentId FROM dbimagecat.categories WHERE Id = ?";
-        String query3 = "UPDATE dbimagecat.categories SET childrenOrder = ? WHERE Id = ?";
-        ArrayList<Integer> tb = this.findChildrenIdById(f);
+        System.out.println("TopicDAO: l'id da spostare è "+id);
 
+        //cerco il padre vecchio (attuale)
+        String query2 = "SELECT parentId FROM dbimagecat.categories WHERE Id = ?";
+        PreparedStatement p2 = c.prepareStatement(query2);
+        p2.setInt(1, id);
+        ResultSet r2 = p2.executeQuery();
+        Integer oldfather = null;
+        r2.next();
+        oldfather = r2.getInt("parentId");
+        if(oldfather == 0)
+            oldfather = null;
+        System.out.println("TopicDAO: l'id del padre vecchio è "+oldfather);
+
+        //controllo che il nuovo padre non abbia già 9 figli
+        ArrayList<Integer> tb = this.findChildrenIdById(f);
+        for(Integer i : tb){
+            System.out.println("TopicDAO: "+i+ " id presente nel nuovo padre avente ordine "+(tb.indexOf(i)+1));
+        }
         if(tb.size()>=9)
             return 1;
+
+        //ottengo i vecchi fratelli se esistono
+        ArrayList<Integer> oldbrothers = new ArrayList<>(this.findChildrenIdById(oldfather));
+        System.out.println("TopicDAO: il padre vecchio di id ha "+oldbrothers.size()+" figli(o)");
+        for (Integer o : oldbrothers)
+            System.out.println(o+" id presente nel vecchio padre avente ordine "+(oldbrothers.indexOf(o)+1));
+        if(oldbrothers.contains(id)){
+            oldbrothers.remove((Integer) id);
+            System.out.println("TopicDAO: id ha "+oldbrothers.size()+" fratelli");
+        }
+        for (Integer o : oldbrothers)
+            System.out.println(o+" id presente nel vecchio padre aggiornato avente ordine "+(oldbrothers.indexOf(o)+1));
+
+        String query1 = "UPDATE dbimagecat.categories SET parentId = ?, childrenOrder = ? WHERE Id = ?";
+        String query3 = "UPDATE dbimagecat.categories SET childrenOrder = ? WHERE Id = ?";
         c.setAutoCommit(false);
         try {
             PreparedStatement p1 = c.prepareStatement(query1);
-            PreparedStatement p2 = c.prepareStatement(query2);
-
-            p2.setInt(1, id);
-            ResultSet r2 = p2.executeQuery();
-            Integer oldfather = null;
-            if (r2.next())
-                oldfather = r2.getInt("parentId");
-
-
             PreparedStatement p3 = c.prepareStatement(query3);
-            ArrayList<Integer> oldbrothers = new ArrayList<>(this.findChildrenIdById(oldfather));
-            oldbrothers.remove(Integer.valueOf(id));
+
+            //modifico l'ordine dei vecchi fratelli
             for (Integer o : oldbrothers) {
+                System.out.println("TopicDAO: "+o+" id vecchio fratello aggiornato con ordine "+(oldbrothers.indexOf(o)+1));
                 p3.setInt(2, o);
-                p3.setInt(1, oldbrothers.indexOf(o) + 1);
+                p3.setInt(1, (oldbrothers.indexOf(o) + 1));
                 p3.executeUpdate();
                 p3.clearParameters();
             }
-//todo il problema sembra essere legato agli indici dei fratelli vecchi che non vengono aggiornati, in particolare quelli più grandi dell'oggetto rimosso
+
             if (f == null)
                 p1.setNull(1, Types.INTEGER);
             else
                 p1.setInt(1, f);
-            tb = this.findChildrenIdById(f);
             p1.setInt(2,tb.size()+ (tb.contains(id) ? 0 : 1));
             p1.setInt(3, id);
             p1.executeUpdate();
@@ -196,6 +211,31 @@ public class TopicDAO {
 
 
 
+    }
+
+    public ArrayList<Integer> getFatherHierarcy(Integer id) throws SQLException {
+        String query = "SELECT parentId FROM dbimagecat.categories WHERE Id = ?";
+        PreparedStatement p1 = c.prepareStatement(query);
+        ArrayList<Integer> result = new ArrayList<>();
+        int index;
+        p1.setInt(1,id);
+        ResultSet r1 = p1.executeQuery();
+        r1.next();
+        index = r1.getInt("parentId");
+        if(index!=0)
+            result.add(index);
+        r1.close();
+        while(index != 0){
+            p1.clearParameters();
+            p1.setInt(1,index);
+            r1 = p1.executeQuery();
+            r1.next();
+            index = r1.getInt("parentId");
+            result.add(index);
+            r1.close();
+        }
+        p1.close();
+        return result;
     }
 
 
