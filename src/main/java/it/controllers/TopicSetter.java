@@ -18,7 +18,7 @@ public class TopicSetter extends HttpServlet {
         TemplateEngineManager tem = new TemplateEngineManager(this.getServletContext());
         WebContext webctx = new WebContext(request, response, this.getServletContext(), request.getLocale());
         webctx.setVariable("username", ((UserBean)request.getSession().getAttribute("user")).getUsername());
-        webctx.setVariable("backhome","<a href=\"/gruppo33/areapersonale/home\">Clicca qui</a> per annullare lo spostamento");
+        //webctx.setVariable("backhome","<a href=\"/gruppo33/areapersonale/home\">Clicca qui</a> per annullare lo spostamento");
         String source = request.getParameter("src");
         String dest = request.getParameter("dest");
         if(source==null||source.isBlank()){
@@ -38,9 +38,9 @@ public class TopicSetter extends HttpServlet {
                     webctx.setVariable("DBerror","<br>la categoria da spostare o la destinazione scelta non esistono, <a href=\"/gruppo33/areapersonale/home\">clicca qui</a> per annullare lo spostamento.<br>");
                     tem.getTemplateEngine().process("HomeDestination", webctx, response.getWriter());
                 }else {
-                    if (dest!=null && td.getFatherHierarcy(dst).contains(src)) {
-                        System.out.println("TopicSetter: la categoria da spostare o la destinazione scelta non esistono");
-                        webctx.setVariable("DBerror", "<br>la destinazione scelta non e' valida in quanto sottocategoria della categoria da spostare, <a href=\"/gruppo33/areapersonale/home\">clicca qui</a> per annullare lo spostamento.<br>");
+                    if ((dest!=null && td.getFatherHierarcy(dst).contains(src)) || dst == src) {
+                        System.out.println("TopicSetter: impossibile spostare, la destinazione scelta coincide con o è sottocategoria della categoria da spostare");
+                        webctx.setVariable("DBerror", "<br>la destinazione scelta non e' valida in quanto coincide con o è sottocategoria della categoria da spostare, <a href=\"/gruppo33/areapersonale/home\">clicca qui</a> per annullare lo spostamento.<br>");
                         tem.getTemplateEngine().process("HomeDestination", webctx, response.getWriter());
                     }else{
                     int success = td.changeFatherTo(src, dst);
