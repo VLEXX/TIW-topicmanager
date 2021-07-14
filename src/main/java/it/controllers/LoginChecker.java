@@ -32,9 +32,9 @@ public class LoginChecker extends HttpServlet {
             WebContext webctx = new WebContext(request, response, this.getServletContext(), request.getLocale());
 
             //caso 1a: dati inseriti in formato non valido
-            if (username == null || username.isBlank() || password == null || password.isBlank()) {
+            if (username == null || username.isBlank() || password == null || password.isBlank() || !username.matches("^[a-zA-Z0-9]*$")) {
                 System.out.println("LoginChecker: i dati non sono validi -> dispatching edited LoginFile.html");
-                webctx.setVariable("errore", "<p style=\"color:red;\">I campi sono obbligatori!</p>");
+                webctx.setVariable("errore", "<p style=\"color:red;\">I campi sono obbligatori e il nome utente deve essere alfanumerico.</p>");
                 tem.getTemplateEngine().process("LoginFile", webctx, response.getWriter());
 
                 //caso 1b: formato dati valido

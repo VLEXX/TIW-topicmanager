@@ -30,13 +30,12 @@ public class TopicMover extends HttpServlet {
             c.close();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
-            webctx.setVariable("DBerror","<br>Il servizio non è al momento disponibile, riprovare più tardi<br>");
+            webctx.setVariable("DBerror","<br>Il servizio non è al momento disponibile, riprovare più tardi, <a href=\"/gruppo33/areapersonale/home\">clicca qui</a> per tornare alla home.<br>");
             tem.getTemplateEngine().process("HomeDestination", webctx, response.getWriter());
         }
         if(topictbm==null||topictbm.isBlank()){
-            webctx.setVariable("DBerror","<br>Richiesta non valida, topic vuoto o inesistente<br>");
+            webctx.setVariable("DBerror","<br>Richiesta non valida, topic vuoto o inesistente, <a href=\"/gruppo33/areapersonale/home\">clicca qui</a> per tornare alla home.<br>");
             System.out.println("TopicMover: richiesta pervenuta senza topic o con topic vuoto");
-            //todo reindirizzare alla home tramite link
         }else{
             try{
                 Connection c = DBConnectionSupplier.getConnection();
@@ -50,8 +49,7 @@ public class TopicMover extends HttpServlet {
             }
             if(id==null){
                 System.out.println("TopicMover: topic inesistente");
-                webctx.setVariable("DBerror","<br>Il topic selezionato non esiste<br>");
-                //todo aggiungere link negli errori DBerror per tornare alla home
+                webctx.setVariable("DBerror","<br>Il topic selezionato non esiste, <a href=\"/gruppo33/areapersonale/home\">clicca qui</a> per tornare alla home.<br>");
             }else{
                 System.out.println("TopicMover: il topic selezionato esiste");
                 webctx.setVariable("rootTopicBeanAsList",root);
@@ -59,8 +57,9 @@ public class TopicMover extends HttpServlet {
                 webctx.setVariable("topictbm",topictbm);
 
             }
-            tem.getTemplateEngine().process("HomeDestination", webctx, response.getWriter());
+
         }
+        tem.getTemplateEngine().process("HomeDestination", webctx, response.getWriter());
     }
 
 }

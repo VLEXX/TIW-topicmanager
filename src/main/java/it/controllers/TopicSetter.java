@@ -39,7 +39,7 @@ public class TopicSetter extends HttpServlet {
                     tem.getTemplateEngine().process("HomeDestination", webctx, response.getWriter());
                 }else {
                     if ((dest!=null && td.getFatherHierarcy(dst).contains(src)) || dst == src) {
-                        System.out.println("TopicSetter: impossibile spostare, la destinazione scelta coincide con o è sottocategoria della categoria da spostare");
+                        System.out.println("TopicSetter: impossibile spostare, la destinazione scelta coincide con o e' sottocategoria della categoria da spostare");
                         webctx.setVariable("DBerror", "<br>la destinazione scelta non e' valida in quanto coincide con o è sottocategoria della categoria da spostare, <a href=\"/gruppo33/areapersonale/home\">clicca qui</a> per annullare lo spostamento.<br>");
                         tem.getTemplateEngine().process("HomeDestination", webctx, response.getWriter());
                     }else{

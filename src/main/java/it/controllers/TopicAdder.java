@@ -26,9 +26,9 @@ public class TopicAdder extends HttpServlet {
 
 
     //caso 1a: topicname nullo o vuoto
-        if(topicname == null || topicname.isBlank()){
+        if(topicname == null || topicname.isBlank() || !topicname.matches("^[a-zA-Z0-9 ]*$")){
             System.out.println("TopicAdder: i dati non sono validi -> dispatching edited Home.html");
-            webctx.setVariable("errore", "<p style=\"color:red;\">E' obbligatorio specificare la nuova categoria!</p>");
+            webctx.setVariable("errore", "<p style=\"color:red;\">E' obbligatorio specificare la nuova categoria e deve essere alfanumerica (spazi ammessi)</p>");
         }else{
             Connection c = null;
             try {
