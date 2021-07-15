@@ -100,8 +100,9 @@ public class TopicDAO {
             } catch (Exception e1) {
                 throw new SQLException(e1);
             }
-            return id;
+
         }
+        return id;
 
     }
 
