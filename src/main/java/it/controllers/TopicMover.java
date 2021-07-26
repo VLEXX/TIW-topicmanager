@@ -53,8 +53,10 @@ public class TopicMover extends HttpServlet {
             }else{
                 System.out.println("TopicMover: il topic selezionato esiste");
                 webctx.setVariable("rootTopicBeanAsList",root);
-                webctx.setVariable("rootinsertion","<a href=\"/gruppo33/areapersonale/moveto?src="+topictbm+"\" >sposta nella radice</a>");
+                webctx.setVariable("rootinsertion","<a href=\"/gruppo33/areapersonale/moveto?src="+topictbm.replace(" ","+")+"\" >sposta nella radice</a>");
                 webctx.setVariable("topictbm",topictbm);
+                webctx.setVariable("topictbmutf",topictbm.replace(" ","+"));
+                webctx.setVariable("backhome","<a href='/gruppo33/areapersonale/home' >annulla selezione</a>");
 
             }
 

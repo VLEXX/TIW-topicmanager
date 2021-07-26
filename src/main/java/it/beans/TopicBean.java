@@ -11,6 +11,7 @@ public class TopicBean {
     ArrayList<TopicBean> children;
     Integer parid;
     String treeindex;
+    String topicutf;
 
     public TopicBean(TopicDAO td, int id, Integer parid, String treeindex) throws SQLException {
         this.id = id;
@@ -18,12 +19,17 @@ public class TopicBean {
         this.topic = td.findTopicById(id);
         this.children = new ArrayList<>();
         this.treeindex = treeindex;
+        this.topicutf = this.topic.replace(" ","+");
 
         ArrayList<Integer> childrenids = td.findChildrenIdById(id);
         for(Integer c : childrenids){
             this.children.add(new TopicBean(td,c,id,treeindex+ (childrenids.indexOf(c) + 1)));
         }
 
+    }
+
+    public String getTopicutf() {
+        return topicutf;
     }
 
     public ArrayList<TopicBean> getChildren() {

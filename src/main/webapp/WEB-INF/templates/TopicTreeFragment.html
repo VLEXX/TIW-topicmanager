@@ -2,7 +2,7 @@
 <section th:fragment="topicFragment">
   <ul>
     <li th:each="topicBean : ${topicBeanList}">
-      <span  th:utext="${topicBean.getTreeindex()+' '+topicBean.getTopic()+' <a href=/gruppo33/areapersonale/move?topic='+topicBean.getTopic()+'>sposta</a>'}"></span>
+      <span  th:utext="${topicBean.getTreeindex()+' '+topicBean.getTopic()+' <a href=/gruppo33/areapersonale/move?topic='+topicBean.getTopicutf()+'>sposta</a>'}"></span>
       <section th:include="@{TopicTreeFragment} :: topicFragment" th:with="topicBeanList=${topicBean.getChildren()}"></section>
     </li>
   </ul>
