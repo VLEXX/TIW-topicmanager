@@ -21,7 +21,7 @@ public class TopicSetter extends HttpServlet {
         //webctx.setVariable("backhome","<a href=\"/gruppo33/areapersonale/home\">Clicca qui</a> per annullare lo spostamento");
         String source = request.getParameter("src");
         String dest = request.getParameter("dest");
-        if(source==null||source.isBlank()){
+        if(source==null||source.isBlank() || source.length()>255){
             System.out.println("TopicSetter: la categoria da spostare non è stata definita correttamente");
             webctx.setVariable("DBerror","<br>Richiesta non valida, <a href=\"/gruppo33/areapersonale/home\">clicca qui</a>per tornare alla home.<br>");
             tem.getTemplateEngine().process("HomeDestination", webctx, response.getWriter());
@@ -31,7 +31,7 @@ public class TopicSetter extends HttpServlet {
                 Connection c = DBConnectionSupplier.getConnection();
                 TopicDAO td = new TopicDAO(c);
                 src = td.findIdByTopic(source);
-                if(dest!=null)
+                if(dest!=null && dest.length()<256)
                     dst = td.findIdByTopic(dest);
                 if(src == null || (dst==null && dest != null)){
                     System.out.println("TopicSetter: la categoria da spostare o la destinazione scelta non esistono");
