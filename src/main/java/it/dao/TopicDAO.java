@@ -66,7 +66,6 @@ public class TopicDAO {
             while(res1.next()){
                 children.add(res1.getInt("Id"));
             }
-            System.out.println("La ricerca ha prodotto "+children.size()+" risultati");
             res1.close();
             p.close();
         } catch (SQLException throwables) {
